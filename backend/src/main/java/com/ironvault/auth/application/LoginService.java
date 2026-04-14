@@ -1,5 +1,6 @@
 package com.ironvault.auth.application;
 
+import com.ironvault.auth.adapter.in.web.response.AuthResponse;
 import com.ironvault.auth.domain.exception.InvalidCredentialsException;
 import com.ironvault.auth.domain.exception.UserNotFoundException;
 import com.ironvault.auth.domain.model.User;
@@ -26,7 +27,7 @@ public class LoginService implements LoginUseCase {
     }
 
     @Override
-    public String execute(String email, String password) {
+    public AuthResponse execute(String email, String password) {
 
         log.info("Logando com...E-mail: {}", email);
 
@@ -37,6 +38,13 @@ public class LoginService implements LoginUseCase {
             throw new InvalidCredentialsException();
         }
 
-        return jwtTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateToken(user);
+
+        return AuthResponse.of(
+                token,
+                jwtTokenProvider.getExpirationMs(),
+                user.getEmail(),
+                user.getRole().name()
+        );
     }
 }

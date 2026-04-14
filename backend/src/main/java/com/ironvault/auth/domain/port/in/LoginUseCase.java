@@ -1,6 +1,8 @@
 package com.ironvault.auth.domain.port.in;
 
+import com.ironvault.auth.adapter.in.web.response.AuthResponse;
+
 public interface LoginUseCase {
 
-    String execute(String email, String password);
+    AuthResponse execute(String email, String password);
 }
