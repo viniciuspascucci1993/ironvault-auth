@@ -1,5 +1,4 @@
-name: ironvault-stack
-
+name: ironvault-auth-stack
 version: "3.8"
 
 services:
@@ -7,18 +6,18 @@ services:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_DB: ironvault
-      POSTGRES_USER: ironvault
-      POSTGRES_PASSWORD: ironvault
+      POSTGRES_DB: ironvault_auth
+      POSTGRES_USER: ironvault_auth
+      POSTGRES_PASSWORD: ironvault_auth
     ports:
-      - "5490:5432"
+      - "5491:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_auth_data:/var/lib/postgresql/data
     networks:
-      - ironvault-network
+      - ironvault-auth-network
 
 volumes:
-  postgres_data:
+  postgres_auth_data:
 
 networks:
-  ironvault-network:
+  ironvault-auth-network:
