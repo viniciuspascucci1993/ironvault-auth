@@ -3,9 +3,10 @@ spring:
     name: ironvault-auth
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5491/ironvault_auth}
-    username: ${DB_USERNAME:ironvault_auth}
-    password: ${DB_PASSWORD:ironvault_auth}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
@@ -14,9 +15,10 @@ spring:
     properties:
       hibernate:
         format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
-  port: 8081
+  port: ${PORT:8081}
 
 app:
   jwt:
