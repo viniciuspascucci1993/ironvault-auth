@@ -25,3 +25,6 @@ app:
     secret: ${JWT_SECRET}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
     refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
+  notifications:
+    url: ${NOTIFICATIONS_URL}
+    api-key: ${NOTIFICATIONS_API_KEY}
