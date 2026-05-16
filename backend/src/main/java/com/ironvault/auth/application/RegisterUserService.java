@@ -1,5 +1,6 @@
 package com.ironvault.auth.application;
 
+import com.ironvault.auth.adapter.out.client.NotificationClient;
 import com.ironvault.auth.domain.enums.Role;
 import com.ironvault.auth.domain.exception.UserAlreadyExistsException;
 import com.ironvault.auth.domain.model.User;
@@ -15,10 +16,14 @@ public class RegisterUserService implements RegisterUserUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationClient notificationClient;
 
-    public RegisterUserService(UserRepositoryPort userRepositoryPort, PasswordEncoder passwordEncoder) {
+    public RegisterUserService(UserRepositoryPort userRepositoryPort,
+                               PasswordEncoder passwordEncoder,
+                               NotificationClient notificationClient) {
         this.userRepositoryPort = userRepositoryPort;
         this.passwordEncoder = passwordEncoder;
+        this.notificationClient = notificationClient;
     }
 
     @Override
@@ -32,6 +37,8 @@ public class RegisterUserService implements RegisterUserUseCase {
 
         User user = User.create(email, passwordEncoder.encode(password), role);
         userRepositoryPort.save(user);
+
+        notificationClient.sendUserRegisteredEvent(email, email);
 
     }
 }
