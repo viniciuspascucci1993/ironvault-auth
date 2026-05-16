@@ -1,6 +1,10 @@
 # Backend
 backend/target/
 
+target/
+.idea/
+*.class
+
 # Frontend
 frontend/node_modules/
 frontend/dist/
