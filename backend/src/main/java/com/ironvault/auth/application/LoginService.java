@@ -27,7 +27,7 @@ public class LoginService implements LoginUseCase {
     }
 
     @Override
-    public AuthResponse execute(String email, String password) {
+    public AuthResponse execute(String email, String password, String ip, String userAgent) {
 
         log.info("Logando com...E-mail: {}", email);
 
@@ -38,7 +38,7 @@ public class LoginService implements LoginUseCase {
             throw new InvalidCredentialsException();
         }
 
-        String token = jwtTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateToken(user, ip, userAgent);
 
         return AuthResponse.of(
                 token,
