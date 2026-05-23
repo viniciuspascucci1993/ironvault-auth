@@ -9,6 +9,7 @@ import com.ironvault.auth.domain.port.in.LoginUseCase;
 import com.ironvault.auth.domain.port.out.RefreshTokenRepositoryPort;
 import com.ironvault.auth.domain.port.out.UserRepositoryPort;
 import com.ironvault.auth.utils.JwtTokenProvider;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +39,7 @@ public class LoginService implements LoginUseCase {
     }
 
     @Override
+    @Transactional
     public AuthResponse execute(String email, String password, String ip, String userAgent) {
         log.info("Logando com...E-mail: {}", email);
 

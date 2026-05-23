@@ -16,3 +16,6 @@ app:
     secret: ironvault-auth-test-secret-key-only
     expiration-ms: 3600000
     refresh-expiration-ms: 86400000
+  notifications:
+    url: https://notifications.ironvaultpayments.com.br
+    api-key: ironvault-notifications-internal-key

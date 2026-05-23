@@ -4,6 +4,7 @@ import com.ironvault.auth.adapter.out.entity.RefreshTokenEntity;
 import com.ironvault.auth.adapter.out.mapper.RefreshTokenMapper;
 import com.ironvault.auth.domain.model.RefreshToken;
 import com.ironvault.auth.domain.port.out.RefreshTokenRepositoryPort;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -33,6 +34,7 @@ public class RefreshTokenRepositoryAdapter implements RefreshTokenRepositoryPort
     }
 
     @Override
+    @Transactional
     public void revokeAllByUserId(UUID userId) {
         jpaRepository.revokeAllByUserId(userId);
     }
