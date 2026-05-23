@@ -52,9 +52,8 @@ public class LoginService implements LoginUseCase {
 
         String token = jwtTokenProvider.generateToken(user, ip, userAgent);
 
-        // Gera e salva o refresh token
         String rawRefreshToken = UUID.randomUUID().toString();
-        RefreshToken refreshToken = RefreshToken.create(user.getId(), rawRefreshToken,refreshExpirationMs);
+        RefreshToken refreshToken = RefreshToken.create(user.getId(), rawRefreshToken, refreshExpirationMs);
         refreshTokenRepositoryPort.save(refreshToken);
 
         log.info("Login successful userId={} ip={}", user.getId(), ip);
