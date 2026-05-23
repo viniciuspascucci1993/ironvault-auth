@@ -28,3 +28,9 @@ app:
   notifications:
     url: ${NOTIFICATIONS_URL}
     api-key: ${NOTIFICATIONS_API_KEY}
+
+logging:
+  level:
+    com.ironvault: DEBUG
+    org.springframework.jdbc: DEBUG
+    com.zaxxer.hikari: DEBUG

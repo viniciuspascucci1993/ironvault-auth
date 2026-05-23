@@ -1,6 +1,8 @@
 package com.ironvault.auth.domain.port.in;
 
+import com.ironvault.auth.adapter.in.web.response.AuthResponse;
+
 public interface RefreshTokenUseCase {
 
-    String execute(String refreshToken);
+    AuthResponse refresh(String refreshToken);
 }
