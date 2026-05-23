@@ -12,10 +12,11 @@ public class AuthResponse {
     private String accessToken;
     private String tokenType;
     private long expiresIn;
+    private String refreshToken;
     private String email;
     private String role;
 
-    public static AuthResponse of(String token, long expiresIn, String email, String role) {
-        return new AuthResponse(token, "Bearer", expiresIn, email, role);
+    public static AuthResponse of(String token, long expiresIn, String refreshToken, String email, String role) {
+        return new AuthResponse(token, "Bearer", expiresIn, refreshToken, email, role);
     }
 }
