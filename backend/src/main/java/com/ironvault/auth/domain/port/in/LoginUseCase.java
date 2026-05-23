@@ -4,5 +4,5 @@ import com.ironvault.auth.adapter.in.web.response.AuthResponse;
 
 public interface LoginUseCase {
 
-    AuthResponse execute(String email, String password);
+    AuthResponse execute(String email, String password, String ip, String userAgent);
 }

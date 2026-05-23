@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtTokenProvider {
@@ -24,14 +25,18 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(User user) {
+    public String generateToken(User user, String ipAddress, String userAgent) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
+                .issuer("ironvault-auth")
                 .subject(user.getEmail())
                 .claim("role", user.getRole().name())
                 .claim("userId", user.getId().toString())
+                .claim("ip", ipAddress)
+                .claim("userAgent", userAgent)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(getSigningKey())

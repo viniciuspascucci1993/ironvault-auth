@@ -4,7 +4,9 @@ import com.ironvault.auth.adapter.in.web.request.LoginRequest;
 import com.ironvault.auth.adapter.in.web.request.RegisterRequest;
 import com.ironvault.auth.adapter.in.web.response.AuthResponse;
 import com.ironvault.auth.domain.port.in.LoginUseCase;
+import com.ironvault.auth.domain.port.in.RefreshTokenUseCase;
 import com.ironvault.auth.domain.port.in.RegisterUserUseCase;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,17 +15,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final RegisterUserUseCase registerUserUseCase;
     private final LoginUseCase loginUseCase;
+    private final RefreshTokenUseCase refreshTokenUseCase;
 
     public AuthController(RegisterUserUseCase registerUserUseCase,
-                          LoginUseCase loginUseCase) {
+                          LoginUseCase loginUseCase,
+                          RefreshTokenUseCase refreshTokenUseCase) {
         this.registerUserUseCase = registerUserUseCase;
         this.loginUseCase = loginUseCase;
+        this.refreshTokenUseCase = refreshTokenUseCase;
     }
 
     @PostMapping("/register")
@@ -33,8 +40,27 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        AuthResponse token = loginUseCase.execute(request.getEmail(), request.getPassword());
+    public ResponseEntity<AuthResponse> login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest) {
+        String ip = getClientIp(httpRequest);
+        String userAgent = httpRequest.getHeader("User-Agent");
+        AuthResponse token = loginUseCase.execute(request.getEmail(), request.getPassword(), ip, userAgent);
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(
+            @RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        return ResponseEntity.ok(refreshTokenUseCase.refresh(refreshToken));
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 }

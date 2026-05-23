@@ -1,0 +1,5 @@
+# Created at 2026-05-23T14:08:11.584
+Boot Manifest-JAR contains absolute paths in classpath 'E:\IronVault\ironvault-auth\ironvault-auth\backend\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+
