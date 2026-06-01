@@ -2,6 +2,7 @@ package com.ironvault.auth.application;
 
 import com.ironvault.auth.adapter.in.web.response.AuthResponse;
 import com.ironvault.auth.domain.exception.InvalidCredentialsException;
+import com.ironvault.auth.domain.exception.TooManyRequestsException;
 import com.ironvault.auth.domain.exception.UserNotFoundException;
 import com.ironvault.auth.domain.model.RefreshToken;
 import com.ironvault.auth.domain.model.User;
@@ -25,23 +26,32 @@ public class LoginService implements LoginUseCase {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepositoryPort refreshTokenRepositoryPort;
+    private final RateLimitingService rateLimitingService;
 
     @Value("${app.jwt.refresh-expiration-ms}")
     private long refreshExpirationMs;
 
     public LoginService(UserRepositoryPort userRepositoryPort,
                 PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider,
-                        RefreshTokenRepositoryPort refreshTokenRepositoryPort) {
+                RefreshTokenRepositoryPort refreshTokenRepositoryPort,
+                RateLimitingService rateLimitingService) {
         this.userRepositoryPort = userRepositoryPort;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenRepositoryPort = refreshTokenRepositoryPort;
+        this.rateLimitingService = rateLimitingService;
     }
 
     @Override
     @Transactional
     public AuthResponse execute(String email, String password, String ip, String userAgent) {
         log.info("Logando com...E-mail: {}", email);
+
+        // Rate Limiting por IP ou por E-mail
+        if (!rateLimitingService.isAllowed("login:ip:" + ip) ||
+        !rateLimitingService.isAllowed("login:email:" + email)) {
+            throw new TooManyRequestsException("Muitas tentativas. Tente novamente em 15 minutos.");
+        }
 
         User user = userRepositoryPort.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));

@@ -17,6 +17,13 @@ spring:
         format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+
 server:
   port: ${PORT:8081}
 
@@ -28,9 +35,3 @@ app:
   notifications:
     url: ${NOTIFICATIONS_URL}
     api-key: ${NOTIFICATIONS_API_KEY}
-
-logging:
-  level:
-    com.ironvault: DEBUG
-    org.springframework.jdbc: DEBUG
-    com.zaxxer.hikari: DEBUG
