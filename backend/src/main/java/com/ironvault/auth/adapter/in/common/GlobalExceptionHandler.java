@@ -1,6 +1,7 @@
 package com.ironvault.auth.adapter.in.common;
 
 import com.ironvault.auth.domain.exception.InvalidCredentialsException;
+import com.ironvault.auth.domain.exception.TooManyRequestsException;
 import com.ironvault.auth.domain.exception.UserAlreadyExistsException;
 import com.ironvault.auth.domain.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,6 +54,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         "Internal Server Error", "An unexpected error occurred", request.getRequestURI()));
+    }
+
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ApiError> handleTooManyRequests(TooManyRequestsException ex, HttpServletRequest request) {
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new ApiError(HttpStatus.TOO_MANY_REQUESTS.value(), "Too Many Requests",
+                        ex.getMessage(), request.getRequestURI()));
     }
 
     public record ApiError(int status, String title, String message, String path) {}
