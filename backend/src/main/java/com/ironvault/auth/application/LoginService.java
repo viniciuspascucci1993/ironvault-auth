@@ -60,6 +60,9 @@ public class LoginService implements LoginUseCase {
             throw new InvalidCredentialsException();
         }
 
+        rateLimitingService.reset("login:ip:" + ip);
+        rateLimitingService.reset("login:email:" + email);
+
         refreshTokenRepositoryPort.revokeAllByUserId(user.getId());
 
         String token = jwtTokenProvider.generateToken(user, ip, userAgent);
