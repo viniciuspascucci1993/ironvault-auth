@@ -38,4 +38,9 @@ public class RateLimitingService {
                 .addLimit(limit)
                 .build();
     }
+
+    public void reset(String key) {
+        buckets.remove(key);
+        log.info("Rate limit reset for key={}", key);
+    }
 }
