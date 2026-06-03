@@ -1,7 +1,9 @@
 package com.ironvault.auth.adapter.out.entity;
 
-import com.ironvault.auth.domain.enums.Role;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,32 +13,27 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "email_confirmation_tokens")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity {
+public class EmailConfirmationTokenEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false)
+    private UUID userId;
+
     @Column(nullable = false, unique = true)
-    private String email;
+    private String token;
 
     @Column(nullable = false)
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    private boolean used;
 
     @Column(nullable = false)
-    private boolean active;
-
-    @Column(nullable = false)
-    private boolean emailConfirmed;
+    private LocalDateTime expiresAt;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

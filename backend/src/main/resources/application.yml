@@ -33,3 +33,5 @@ app:
   notifications:
     url: ${NOTIFICATIONS_URL}
     api-key: ${NOTIFICATIONS_API_KEY}
+  auth:
+    confirmation-url: ${AUTH_CONFIRMATION_URL}

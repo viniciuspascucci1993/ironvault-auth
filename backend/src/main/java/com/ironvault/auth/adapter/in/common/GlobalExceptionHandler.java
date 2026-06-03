@@ -1,9 +1,6 @@
 package com.ironvault.auth.adapter.in.common;
 
-import com.ironvault.auth.domain.exception.InvalidCredentialsException;
-import com.ironvault.auth.domain.exception.TooManyRequestsException;
-import com.ironvault.auth.domain.exception.UserAlreadyExistsException;
-import com.ironvault.auth.domain.exception.UserNotFoundException;
+import com.ironvault.auth.domain.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,6 +59,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .body(new ApiError(HttpStatus.TOO_MANY_REQUESTS.value(), "Too Many Requests",
                         ex.getMessage(), request.getRequestURI()));
+    }
+
+    @ExceptionHandler(EmailNotConfirmedException.class)
+    public ResponseEntity<ApiError> handleEmailNotConfirmed(EmailNotConfirmedException ex,
+                                                            HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ApiError(HttpStatus.FORBIDDEN.value(), "Forbidden", ex.getMessage(), request.getRequestURI()));
     }
 
     public record ApiError(int status, String title, String message, String path) {}
