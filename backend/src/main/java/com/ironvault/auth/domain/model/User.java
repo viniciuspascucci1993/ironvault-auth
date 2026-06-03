@@ -12,6 +12,7 @@ public class User {
     private String password;
     private Role role;
     private boolean active;
+    private boolean emailConfirmed;
     private LocalDateTime createdAt;
 
     public User() { }
@@ -19,12 +20,14 @@ public class User {
     public User(UUID id, String email,
                 String password, Role role,
                 boolean active,
+                boolean emailConfirmed,
                 LocalDateTime createdAt) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.role = role;
         this.active = active;
+        this.emailConfirmed = emailConfirmed;
         this.createdAt = createdAt;
     }
 
@@ -35,6 +38,7 @@ public class User {
                 encodedPassword,
                 role,
                 true,
+                false,
                 LocalDateTime.now()
         );
     }
@@ -77,6 +81,14 @@ public class User {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isEmailConfirmed() {
+        return emailConfirmed;
+    }
+
+    public void setEmailConfirmed(boolean emailConfirmed) {
+        this.emailConfirmed = emailConfirmed;
     }
 
     public LocalDateTime getCreatedAt() {

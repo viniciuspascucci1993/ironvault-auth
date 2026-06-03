@@ -1,6 +1,7 @@
 package com.ironvault.auth.application;
 
 import com.ironvault.auth.adapter.in.web.response.AuthResponse;
+import com.ironvault.auth.domain.exception.EmailNotConfirmedException;
 import com.ironvault.auth.domain.exception.InvalidCredentialsException;
 import com.ironvault.auth.domain.exception.TooManyRequestsException;
 import com.ironvault.auth.domain.exception.UserNotFoundException;
@@ -58,6 +59,11 @@ public class LoginService implements LoginUseCase {
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new InvalidCredentialsException();
+        }
+
+        // Validar se email esta confirmado
+        if (!user.isEmailConfirmed()) {
+            throw new EmailNotConfirmedException("Por favor, confirme seu email antes de fazer login.");
         }
 
         rateLimitingService.reset("login:ip:" + ip);

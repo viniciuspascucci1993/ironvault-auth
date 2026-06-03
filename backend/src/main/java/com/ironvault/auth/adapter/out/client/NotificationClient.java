@@ -48,4 +48,31 @@ public class NotificationClient {
             log.error("Failed to send notification email={} reason={}", email, ex.getMessage());
         }
     }
+
+    public void sendEmailConfirmationEvent(String email, String confirmationLink) {
+        try {
+            webClient.post()
+                    .uri("/api/notifications/events")
+                    .header("X-API-KEY", apiKey)
+                    .bodyValue(Map.of(
+                            "type", "EMAIL_CONFIRMATION",
+                            "sourceService", "ironvault-auth",
+                            "payload", Map.of(
+                                    "email", email,
+                                    "confirmationLink", confirmationLink
+                            )
+                    ))
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .subscribe(
+                            null,
+                            error -> log.error("Failed to send EMAIL_CONFIRMATION event email={} reason={}",
+                                    email, error.getMessage())
+                    );
+
+
+        } catch (Exception ex) {
+            log.error("Failed to send notification email={} reason={}", email, ex.getMessage());
+        }
+    }
 }
