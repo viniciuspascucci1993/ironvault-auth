@@ -51,8 +51,7 @@ public class RegisterUserService implements RegisterUserUseCase {
         emailConfirmationTokenRepositoryPort.save(token);
 
         String confirmationLink = confirmationBaseUrl + "/api/auth/confirm?token=" + token.getToken();
-
-        notificationClient.sendUserRegisteredEvent(email, email);
+        notificationClient.sendEmailConfirmationEvent(email, confirmationLink);
 
     }
 }
