@@ -23,6 +23,7 @@ public class ConfirmationEmailService implements ConfirmationEmailUseCase {
 
     @Override
     public void confirm(String token) {
+        log.info("Confirming email token={}", token);
         var confirmationToken = repositoryPort.findByToken(token)
                 .orElseThrow(() -> {
                     log.warn("Confirmation token not found token={}", token);
