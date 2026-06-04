@@ -24,27 +24,34 @@ public class ConfirmationEmailService implements ConfirmationEmailUseCase {
     @Override
     public void confirm(String token) {
         log.info("Confirming email token={}", token);
-        var confirmationToken = repositoryPort.findByToken(token)
-                .orElseThrow(() -> {
-                    log.warn("Confirmation token not found token={}", token);
-                    return new InvalidCredentialsException();
-                });
+        try {
+            var confirmationToken = repositoryPort.findByToken(token)
+                    .orElseThrow(() -> {
+                        log.warn("Confirmation token not found token={}", token);
+                        return new InvalidCredentialsException();
+                    });
 
-        if (confirmationToken.isUsed() || confirmationToken.isExpired()) {
-            log.warn("Confirmation token invalid userId={}", confirmationToken.getUserId());
-            throw new InvalidCredentialsException();
+            log.info("Token found userId={}", confirmationToken.getUserId());
+
+            if (confirmationToken.isUsed() || confirmationToken.isExpired()) {
+                log.warn("Confirmation token invalid userId={}", confirmationToken.getUserId());
+                throw new InvalidCredentialsException();
+            }
+
+            var user = userRepositoryPort.findById(confirmationToken.getUserId())
+                    .orElseThrow(InvalidCredentialsException::new);
+
+            user.setEmailConfirmed(true);
+            userRepositoryPort.save(user);
+
+            confirmationToken.setUsed(true);
+            repositoryPort.save(confirmationToken);
+
+            log.info("Email confirmed userId={}", user.getId());
+        } catch (Exception e) {
+            log.error("Error confirming email token={} error={}", token, e.getMessage(), e);
+            throw e;
         }
-
-        var user = userRepositoryPort.findById(confirmationToken.getUserId())
-                .orElseThrow(InvalidCredentialsException::new);
-
-        user.setEmailConfirmed(true);
-        userRepositoryPort.save(user);
-
-        confirmationToken.setUsed(true);
-        repositoryPort.save(confirmationToken);
-
-        log.info("Email confirmed userId={}", user.getId());
 
     }
 }
