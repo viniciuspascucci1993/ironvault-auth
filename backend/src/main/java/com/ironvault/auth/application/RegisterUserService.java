@@ -8,6 +8,7 @@ import com.ironvault.auth.domain.model.User;
 import com.ironvault.auth.domain.port.in.RegisterUserUseCase;
 import com.ironvault.auth.domain.port.out.EmailConfirmationTokenRepositoryPort;
 import com.ironvault.auth.domain.port.out.UserRepositoryPort;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,6 +37,7 @@ public class RegisterUserService implements RegisterUserUseCase {
     }
 
     @Override
+    @Transactional
     public void execute(String email, String password, Role role) {
 
         if (userRepositoryPort.existsByEmail(email)) {
