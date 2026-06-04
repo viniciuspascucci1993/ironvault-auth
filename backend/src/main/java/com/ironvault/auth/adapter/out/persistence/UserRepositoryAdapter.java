@@ -3,6 +3,7 @@ package com.ironvault.auth.adapter.out.persistence;
 import com.ironvault.auth.adapter.out.entity.UserEntity;
 import com.ironvault.auth.domain.model.User;
 import com.ironvault.auth.domain.port.out.UserRepositoryPort;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -18,6 +19,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    @Transactional
     public void save(User user) {
         UserEntity entity = toEntity(user);
         jpaRepository.save(entity);
