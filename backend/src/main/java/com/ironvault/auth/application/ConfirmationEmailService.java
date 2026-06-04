@@ -7,6 +7,7 @@ import com.ironvault.auth.domain.port.out.EmailConfirmationTokenRepositoryPort;
 import com.ironvault.auth.domain.port.out.UserRepositoryPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -22,6 +23,7 @@ public class ConfirmationEmailService implements ConfirmationEmailUseCase {
     }
 
     @Override
+    @Transactional
     public void confirm(String token) {
         log.info("Confirming email token={}", token);
         try {
