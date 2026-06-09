@@ -7,6 +7,10 @@ import com.ironvault.auth.domain.port.in.ConfirmationEmailUseCase;
 import com.ironvault.auth.domain.port.in.LoginUseCase;
 import com.ironvault.auth.domain.port.in.RefreshTokenUseCase;
 import com.ironvault.auth.domain.port.in.RegisterUserUseCase;
+import com.ironvault.auth.adapter.in.web.request.ForgotPasswordRequest;
+import com.ironvault.auth.adapter.in.web.request.ResetPasswordRequest;
+import com.ironvault.auth.domain.port.in.ForgotPasswordUseCase;
+import com.ironvault.auth.domain.port.in.ResetPasswordUseCase;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -24,15 +28,21 @@ public class AuthController {
     private final LoginUseCase loginUseCase;
     private final ConfirmationEmailUseCase confirmationEmailUseCase;
     private final RefreshTokenUseCase refreshTokenUseCase;
+    private final ForgotPasswordUseCase forgotPasswordUseCase;
+    private final ResetPasswordUseCase resetPasswordUseCase;
 
     public AuthController(RegisterUserUseCase registerUserUseCase,
                           LoginUseCase loginUseCase,
                           ConfirmationEmailUseCase confirmationEmailUseCase,
-                          RefreshTokenUseCase refreshTokenUseCase) {
+                          RefreshTokenUseCase refreshTokenUseCase,
+                          ForgotPasswordUseCase forgotPasswordUseCase,
+                          ResetPasswordUseCase resetPasswordUseCase) {
         this.registerUserUseCase = registerUserUseCase;
         this.loginUseCase = loginUseCase;
         this.confirmationEmailUseCase = confirmationEmailUseCase;
         this.refreshTokenUseCase = refreshTokenUseCase;
+        this.forgotPasswordUseCase = forgotPasswordUseCase;
+        this.resetPasswordUseCase = resetPasswordUseCase;
     }
 
     @PostMapping("/register")
@@ -70,6 +80,53 @@ public class AuthController {
                 </body>
                 </html>
                 """);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        forgotPasswordUseCase.execute(request.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        resetPasswordUseCase.execute(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/reset-password", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> resetPasswordForm(@RequestParam String token) {
+        return ResponseEntity.ok("""
+            <html>
+            <body style="font-family: Arial; text-align: center; padding: 50px;">
+                <h1 style="color: #1a1a2e;">🔑 Redefinir senha</h1>
+                <form method="POST" action="/api/auth/reset-password-form">
+                    <input type="hidden" name="token" value="%s"/>
+                    <input type="password" name="newPassword" placeholder="Nova senha"
+                           style="padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #ccc;"/><br/>
+                    <button type="submit"
+                            style="background: #4f46e5; color: white; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer;">
+                        Redefinir senha
+                    </button>
+                </form>
+            </body>
+            </html>
+            """.formatted(token));
+    }
+
+    @PostMapping("/reset-password-form")
+    public ResponseEntity<String> processResetPassword(
+            @RequestParam String token,
+            @RequestParam String newPassword) {
+        resetPasswordUseCase.execute(token, newPassword);
+        return ResponseEntity.ok("""
+            <html>
+            <body style="font-family: Arial; text-align: center; padding: 50px;">
+                <h1 style="color: #28a745;">✅ Senha redefinida com sucesso!</h1>
+                <p style="color: #555;">Você já pode fazer login com sua nova senha.</p>
+            </body>
+            </html>
+            """);
     }
 
     private String getClientIp(HttpServletRequest request) {
