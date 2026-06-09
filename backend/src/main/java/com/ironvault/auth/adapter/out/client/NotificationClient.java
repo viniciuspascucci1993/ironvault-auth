@@ -75,4 +75,28 @@ public class NotificationClient {
             log.error("Failed to send notification email={} reason={}", email, ex.getMessage());
         }
     }
+
+    public void sendPasswordResetEvent(String email, String resetLink) {
+        try {
+            webClient.post()
+                    .uri("/api/notifications/events")
+                    .header("X-API-KEY", apiKey)
+                    .bodyValue(Map.of(
+                            "type", "PASSWORD_RESET",
+                            "sourceService", "ironvault-auth",
+                            "payload", Map.of(
+                                    "email", email,
+                                    "resetLink", resetLink
+                            )
+                    ))
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .subscribe(
+                            null,
+                            error -> log.error("Failed to send PASSWORD_RESET event email={} reason={}", email, error.getMessage())
+                    );
+        } catch (Exception ex) {
+            log.error("Failed to send notification email={} reason={}", email, ex.getMessage());
+        }
+    }
 }
