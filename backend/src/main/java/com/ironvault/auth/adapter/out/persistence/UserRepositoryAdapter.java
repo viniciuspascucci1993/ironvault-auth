@@ -6,6 +6,7 @@ import com.ironvault.auth.domain.port.out.UserRepositoryPort;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,6 +39,14 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public boolean existsByEmail(String email) {
         return jpaRepository.existsByEmail(email);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return jpaRepository.findAll()
+                .stream()
+                .map(this::toDomain)
+                .toList();
     }
 
     private UserEntity toEntity(User user) {
