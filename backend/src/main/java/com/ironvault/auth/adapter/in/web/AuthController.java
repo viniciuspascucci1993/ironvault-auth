@@ -1,16 +1,9 @@
 package com.ironvault.auth.adapter.in.web;
 
-import com.ironvault.auth.adapter.in.web.request.LoginRequest;
-import com.ironvault.auth.adapter.in.web.request.RegisterRequest;
+import com.ironvault.auth.adapter.in.web.request.*;
 import com.ironvault.auth.adapter.in.web.response.AuthResponse;
-import com.ironvault.auth.domain.port.in.ConfirmationEmailUseCase;
-import com.ironvault.auth.domain.port.in.LoginUseCase;
-import com.ironvault.auth.domain.port.in.RefreshTokenUseCase;
-import com.ironvault.auth.domain.port.in.RegisterUserUseCase;
-import com.ironvault.auth.adapter.in.web.request.ForgotPasswordRequest;
-import com.ironvault.auth.adapter.in.web.request.ResetPasswordRequest;
-import com.ironvault.auth.domain.port.in.ForgotPasswordUseCase;
-import com.ironvault.auth.domain.port.in.ResetPasswordUseCase;
+import com.ironvault.auth.domain.port.in.*;
+import com.ironvault.auth.utils.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -19,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,19 +24,26 @@ public class AuthController {
     private final RefreshTokenUseCase refreshTokenUseCase;
     private final ForgotPasswordUseCase forgotPasswordUseCase;
     private final ResetPasswordUseCase resetPasswordUseCase;
+    private final ChangePasswordUseCase changePasswordUseCase;
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     public AuthController(RegisterUserUseCase registerUserUseCase,
                           LoginUseCase loginUseCase,
                           ConfirmationEmailUseCase confirmationEmailUseCase,
                           RefreshTokenUseCase refreshTokenUseCase,
                           ForgotPasswordUseCase forgotPasswordUseCase,
-                          ResetPasswordUseCase resetPasswordUseCase) {
+                          ResetPasswordUseCase resetPasswordUseCase,
+                          ChangePasswordUseCase changePasswordUseCase,
+                          JwtTokenProvider jwtTokenProvider) {
         this.registerUserUseCase = registerUserUseCase;
         this.loginUseCase = loginUseCase;
         this.confirmationEmailUseCase = confirmationEmailUseCase;
         this.refreshTokenUseCase = refreshTokenUseCase;
         this.forgotPasswordUseCase = forgotPasswordUseCase;
         this.resetPasswordUseCase = resetPasswordUseCase;
+        this.changePasswordUseCase = changePasswordUseCase;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping("/register")
@@ -112,6 +113,18 @@ public class AuthController {
             </body>
             </html>
             """.formatted(token));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.replace("Bearer ", "");
+        UUID userId = jwtTokenProvider.extractUserId(token);
+        changePasswordUseCase.execute(userId, request.getCurrentPassword(), request.getNewPassword());
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reset-password-form")
