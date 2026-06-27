@@ -62,6 +62,11 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token);
     }
 
+    public UUID extractUserId(String token) {
+        String userId = extractClaims(token).get("userId", String.class);
+        return UUID.fromString(userId);
+    }
+
     public String extractEmail(String token) {
         return extractClaims(token).getSubject();
     }
