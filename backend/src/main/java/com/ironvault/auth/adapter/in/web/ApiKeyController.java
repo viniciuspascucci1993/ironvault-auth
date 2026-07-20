@@ -56,6 +56,7 @@ public class ApiKeyController {
                 .orElse(ResponseEntity.ok(Map.of("apiKey", "")));
     }
 
+    @GetMapping("/validate")
     public ResponseEntity<Map<String, Object>> validate(
             @RequestHeader("X-Internal-Key") String internalKey,
             @RequestParam("key") String apiKey
