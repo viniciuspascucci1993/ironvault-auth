@@ -1,6 +1,7 @@
 package com.ironvault.auth.adapter.in.web.response;
 
 
+import com.ironvault.auth.domain.enums.ApprovalStatus;
 import com.ironvault.auth.domain.enums.Role;
 import com.ironvault.auth.domain.model.User;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class UserResponse {
     private Role role;
     private boolean active;
     private boolean emailConfirmed;
+    private ApprovalStatus approvalStatus;
     private LocalDateTime createdAt;
 
     public static UserResponse of(User user) {
@@ -29,6 +31,7 @@ public class UserResponse {
         response.setRole(user.getRole());
         response.setActive(user.isActive());
         response.setEmailConfirmed(user.isEmailConfirmed());
+        response.setApprovalStatus(user.getApprovalStatus());
         response.setCreatedAt(user.getCreatedAt());
         return response;
     }

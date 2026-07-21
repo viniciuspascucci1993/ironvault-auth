@@ -57,6 +57,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 user.getRole(),
                 user.isActive(),
                 user.isEmailConfirmed(),
+                user.getApprovalStatus(),
                 user.getCreatedAt()
         );
     }
@@ -69,6 +70,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 entity.getRole(),
                 entity.isActive(),
                 entity.isEmailConfirmed(),
+                entity.getApprovalStatus(),
                 entity.getCreatedAt()
         );
     }
