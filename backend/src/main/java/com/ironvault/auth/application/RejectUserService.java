@@ -1,6 +1,8 @@
 package com.ironvault.auth.application;
 
+import com.ironvault.auth.adapter.out.client.NotificationClient;
 import com.ironvault.auth.domain.enums.ApprovalStatus;
+import com.ironvault.auth.domain.enums.Role;
 import com.ironvault.auth.domain.exception.UserNotFoundException;
 import com.ironvault.auth.domain.port.in.RejectUserUseCase;
 import com.ironvault.auth.domain.port.out.UserRepositoryPort;
@@ -15,9 +17,11 @@ import java.util.UUID;
 public class RejectUserService implements RejectUserUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
+    private final NotificationClient notificationClient;
 
-    public RejectUserService(UserRepositoryPort userRepositoryPort) {
+    public RejectUserService(UserRepositoryPort userRepositoryPort, NotificationClient notificationClient) {
         this.userRepositoryPort = userRepositoryPort;
+        this.notificationClient = notificationClient;
     }
 
     @Override
@@ -26,9 +30,19 @@ public class RejectUserService implements RejectUserUseCase {
         var user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId.toString()));
 
+        if (user.getRole() != Role.MERCHANT) {
+            throw new IllegalArgumentException("Only MERCHANT users can be rejected");
+        }
+
+        if (user.getApprovalStatus() == ApprovalStatus.REJECTED) {
+            throw new IllegalArgumentException("User is already rejected");
+        }
+
         user.setApprovalStatus(ApprovalStatus.REJECTED);
         user.setActive(false);
         userRepositoryPort.save(user);
+
+        notificationClient.sendMerchantRejectedEvent(user.getEmail());
 
         log.info("User rejected userId={}", userId);
 
