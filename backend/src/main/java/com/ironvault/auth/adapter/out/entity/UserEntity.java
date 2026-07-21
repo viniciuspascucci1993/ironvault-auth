@@ -1,5 +1,6 @@
 package com.ironvault.auth.adapter.out.entity;
 
+import com.ironvault.auth.domain.enums.ApprovalStatus;
 import com.ironvault.auth.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,6 +37,9 @@ public class UserEntity {
 
     @Column(nullable = false)
     private boolean emailConfirmed;
+
+    @Column(nullable = false)
+    private ApprovalStatus approvalStatus;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
