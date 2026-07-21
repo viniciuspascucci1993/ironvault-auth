@@ -38,6 +38,7 @@ public class UserEntity {
     @Column(nullable = false)
     private boolean emailConfirmed;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ApprovalStatus approvalStatus;
 
