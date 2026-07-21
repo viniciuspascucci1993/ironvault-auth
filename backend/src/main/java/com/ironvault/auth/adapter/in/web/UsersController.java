@@ -4,10 +4,7 @@ import com.ironvault.auth.adapter.in.web.request.UpdateRoleRequest;
 import com.ironvault.auth.adapter.in.web.request.UpdateStatusRequest;
 import com.ironvault.auth.adapter.in.web.response.UserResponse;
 import com.ironvault.auth.domain.model.User;
-import com.ironvault.auth.domain.port.in.GetAllUsersUseCase;
-import com.ironvault.auth.domain.port.in.GetUserByIdUseCase;
-import com.ironvault.auth.domain.port.in.UpdateUserRoleUseCase;
-import com.ironvault.auth.domain.port.in.UpdateUserStatusUseCase;
+import com.ironvault.auth.domain.port.in.*;
 import com.ironvault.auth.domain.port.out.UserRepositoryPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,15 +21,21 @@ public class UsersController {
     private final GetUserByIdUseCase getUserByIdUseCase;
     private final UpdateUserStatusUseCase updateUserStatusUseCase;
     private final UpdateUserRoleUseCase updateUserRoleUseCase;
+    private final ApproveUserUseCase approveUserUseCase;
+    private final RejectUserUseCase rejectUserUseCase;
 
     public UsersController(GetAllUsersUseCase getAllUsersUseCase,
                            GetUserByIdUseCase getUserByIdUseCase,
                            UpdateUserStatusUseCase updateUserStatusUseCase,
-                           UpdateUserRoleUseCase updateUserRoleUseCase) {
+                           UpdateUserRoleUseCase updateUserRoleUseCase,
+                           ApproveUserUseCase approveUserUseCase,
+                           RejectUserUseCase rejectUserUseCase) {
         this.getAllUsersUseCase = getAllUsersUseCase;
         this.getUserByIdUseCase = getUserByIdUseCase;
         this.updateUserStatusUseCase = updateUserStatusUseCase;
         this.updateUserRoleUseCase = updateUserRoleUseCase;
+        this.approveUserUseCase = approveUserUseCase;
+        this.rejectUserUseCase = rejectUserUseCase;
     }
 
     @GetMapping
@@ -63,6 +66,22 @@ public class UsersController {
     public ResponseEntity<Void> updateRole(@PathVariable UUID id,
                                            @RequestBody UpdateRoleRequest request) {
         updateUserRoleUseCase.execute(id, request.getRole());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> approve(@PathVariable("id") UUID id) {
+
+        approveUserUseCase.execute(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> reject(@PathVariable("id") UUID id) {
+
+        rejectUserUseCase.execute(id);
         return ResponseEntity.ok().build();
     }
 }

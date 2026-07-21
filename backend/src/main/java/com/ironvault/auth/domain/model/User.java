@@ -1,5 +1,6 @@
 package com.ironvault.auth.domain.model;
 
+import com.ironvault.auth.domain.enums.ApprovalStatus;
 import com.ironvault.auth.domain.enums.Role;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ public class User {
     private Role role;
     private boolean active;
     private boolean emailConfirmed;
+    private ApprovalStatus approvalStatus;
     private LocalDateTime createdAt;
 
     public User() { }
@@ -21,6 +23,7 @@ public class User {
                 String password, Role role,
                 boolean active,
                 boolean emailConfirmed,
+                ApprovalStatus approvalStatus,
                 LocalDateTime createdAt) {
         this.id = id;
         this.email = email;
@@ -37,8 +40,9 @@ public class User {
                 email,
                 encodedPassword,
                 role,
-                true,
+                true, // sempre ativo quando cadastrado pelo ADMIN
                 false,
+                ApprovalStatus.APPROVED, // sempre aprovado quando cadastrado pelo ADMIN
                 LocalDateTime.now()
         );
     }
@@ -89,6 +93,14 @@ public class User {
 
     public void setEmailConfirmed(boolean emailConfirmed) {
         this.emailConfirmed = emailConfirmed;
+    }
+
+    public ApprovalStatus getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(ApprovalStatus approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 
     public LocalDateTime getCreatedAt() {
