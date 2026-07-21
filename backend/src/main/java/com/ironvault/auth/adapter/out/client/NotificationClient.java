@@ -99,4 +99,52 @@ public class NotificationClient {
             log.error("Failed to send notification email={} reason={}", email, ex.getMessage());
         }
     }
+
+    public void sendMerchantApprovedEvent(String email) {
+        try {
+            webClient.post()
+                    .uri("/api/notifications/events")
+                    .header("X-API-Key", apiKey)
+                    .bodyValue(Map.of(
+                            "type", "MERCHANT_APPROVED",
+                            "sourceService", "ironvault-auth",
+                            "payload", Map.of(
+                                    "email", email
+                            )
+                    ))
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .subscribe(
+                            null,
+                            error -> log.error("Failed to send MERCHANT_APPROVED event email={} reason={}",
+                                    email, error.getMessage())
+                    );
+        } catch (Exception ex) {
+            log.error("Failed to send notification email={} reason={}", email, ex.getMessage());
+        }
+    }
+
+    public void sendMerchantRejectedEvent(String email) {
+        try {
+            webClient.post()
+                    .uri("/api/notifications/events")
+                    .header("X-API-Key", apiKey)
+                    .bodyValue(Map.of(
+                            "type", "MERCHANT_REJECTED",
+                            "sourceService", "ironvault-auth",
+                            "payload", Map.of(
+                                    "email", email
+                            )
+                    ))
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .subscribe(
+                            null,
+                            error -> log.error("Failed to send MERCHANT_REJECTED event email={} reason={}",
+                                    email, error.getMessage())
+                    );
+        } catch (Exception ex) {
+            log.error("Failed to send notification email={} reason={}", email, ex.getMessage());
+        }
+    }
 }
