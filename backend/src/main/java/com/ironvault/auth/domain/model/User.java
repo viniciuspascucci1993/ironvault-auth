@@ -31,6 +31,7 @@ public class User {
         this.role = role;
         this.active = active;
         this.emailConfirmed = emailConfirmed;
+        this.approvalStatus = approvalStatus;
         this.createdAt = createdAt;
     }
 
