@@ -5,6 +5,7 @@ import com.ironvault.auth.domain.enums.Role;
 import com.ironvault.auth.domain.exception.UserAlreadyExistsException;
 import com.ironvault.auth.domain.model.EmailConfirmationToken;
 import com.ironvault.auth.domain.model.User;
+import com.ironvault.auth.domain.port.in.ForgotPasswordUseCase;
 import com.ironvault.auth.domain.port.in.RegisterUserUseCase;
 import com.ironvault.auth.domain.port.out.EmailConfirmationTokenRepositoryPort;
 import com.ironvault.auth.domain.port.out.UserRepositoryPort;
@@ -22,6 +23,7 @@ public class RegisterUserService implements RegisterUserUseCase {
     private final PasswordEncoder passwordEncoder;
     private final EmailConfirmationTokenRepositoryPort emailConfirmationTokenRepositoryPort;
     private final NotificationClient notificationClient;
+    private final ForgotPasswordUseCase forgotPasswordUseCase;
 
     @Value("${app.auth.confirmation-url:https://auth.ironvaultpayments.com.br}")
     private String confirmationBaseUrl;
@@ -29,11 +31,13 @@ public class RegisterUserService implements RegisterUserUseCase {
     public RegisterUserService(UserRepositoryPort userRepositoryPort,
                                PasswordEncoder passwordEncoder,
                                EmailConfirmationTokenRepositoryPort emailConfirmationTokenRepositoryPort,
-                               NotificationClient notificationClient) {
+                               NotificationClient notificationClient,
+                               ForgotPasswordUseCase forgotPasswordUseCase) {
         this.userRepositoryPort = userRepositoryPort;
         this.passwordEncoder = passwordEncoder;
         this.emailConfirmationTokenRepositoryPort = emailConfirmationTokenRepositoryPort;
         this.notificationClient = notificationClient;
+        this.forgotPasswordUseCase = forgotPasswordUseCase;
     }
 
     @Override
@@ -47,13 +51,23 @@ public class RegisterUserService implements RegisterUserUseCase {
         log.info("Criando Usuário...{}", email);
 
         User user = User.create(email, passwordEncoder.encode(password), role);
-        userRepositoryPort.save(user);
 
-        EmailConfirmationToken token = EmailConfirmationToken.create(user.getId());
-        emailConfirmationTokenRepositoryPort.save(token);
+        if (role == Role.MERCHANT) {
+            // MERCHANT cadastrado pelo ADMIN — email já confirmado automaticamente
+            user.setEmailConfirmed(true);
+            userRepositoryPort.save(user);
+            forgotPasswordUseCase.execute(email);
 
-        String confirmationLink = confirmationBaseUrl + "/api/auth/confirm?token=" + token.getToken();
-        notificationClient.sendEmailConfirmationEvent(email, confirmationLink);
+        } else {
+            userRepositoryPort.save(user);
+
+            // ADMIN — fluxo normal de confirmação de email
+            EmailConfirmationToken token = EmailConfirmationToken.create(user.getId());
+            emailConfirmationTokenRepositoryPort.save(token);
+
+            String confirmationLink = confirmationBaseUrl + "/api/auth/confirm?token=" + token.getToken();
+            notificationClient.sendEmailConfirmationEvent(email, confirmationLink);
+        }
 
     }
 }
