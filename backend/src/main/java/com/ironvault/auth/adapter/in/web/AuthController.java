@@ -49,7 +49,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
 
-        registerUserUseCase.execute(request.getEmail(), request.getPassword(), request.getRole());
+        registerUserUseCase.execute(request.getEmail(), request.getPassword(), request.getRole(), request.getSource());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
