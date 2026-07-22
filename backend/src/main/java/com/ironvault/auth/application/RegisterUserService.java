@@ -3,7 +3,6 @@ package com.ironvault.auth.application;
 import com.ironvault.auth.adapter.out.client.NotificationClient;
 import com.ironvault.auth.domain.enums.Role;
 import com.ironvault.auth.domain.exception.UserAlreadyExistsException;
-import com.ironvault.auth.domain.model.EmailConfirmationToken;
 import com.ironvault.auth.domain.model.User;
 import com.ironvault.auth.domain.port.in.ForgotPasswordUseCase;
 import com.ironvault.auth.domain.port.in.RegisterUserUseCase;
@@ -44,6 +43,10 @@ public class RegisterUserService implements RegisterUserUseCase {
     @Transactional
     public void execute(String email, String password, Role role) {
 
+        if (role == Role.ADMIN) {
+            throw new IllegalArgumentException("ADMIN users cannot be registered via API");
+        }
+
         if (userRepositoryPort.existsByEmail(email)) {
             throw new UserAlreadyExistsException(email);
         }
@@ -51,23 +54,9 @@ public class RegisterUserService implements RegisterUserUseCase {
         log.info("Criando Usuário...{}", email);
 
         User user = User.create(email, passwordEncoder.encode(password), role);
-
-        if (role == Role.MERCHANT) {
-            // MERCHANT cadastrado pelo ADMIN — email já confirmado automaticamente
-            user.setEmailConfirmed(true);
-            userRepositoryPort.save(user);
-            forgotPasswordUseCase.execute(email);
-
-        } else {
-            userRepositoryPort.save(user);
-
-            // ADMIN — fluxo normal de confirmação de email
-            EmailConfirmationToken token = EmailConfirmationToken.create(user.getId());
-            emailConfirmationTokenRepositoryPort.save(token);
-
-            String confirmationLink = confirmationBaseUrl + "/api/auth/confirm?token=" + token.getToken();
-            notificationClient.sendEmailConfirmationEvent(email, confirmationLink);
-        }
+        user.setEmailConfirmed(true);
+        userRepositoryPort.save(user);
+        forgotPasswordUseCase.execute(email);
 
     }
 }
