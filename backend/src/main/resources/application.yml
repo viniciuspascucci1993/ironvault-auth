@@ -26,6 +26,9 @@ server:
   port: ${PORT:8081}
 
 app:
+  admin:
+    email: ${ADMIN_EMAIL:#{null}}
+    password: ${ADMIN_PASSWORD:#{null}}
   internal:
     api-key: ${INTERNAL_API_KEY}
   jwt:
