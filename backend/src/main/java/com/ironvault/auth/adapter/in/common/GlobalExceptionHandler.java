@@ -68,5 +68,12 @@ public class GlobalExceptionHandler {
                 .body(new ApiError(HttpStatus.FORBIDDEN.value(), "Forbidden", ex.getMessage(), request.getRequestURI()));
     }
 
+    @ExceptionHandler(AccountNotActiveException.class)
+    public ResponseEntity<ApiError> handleAccountNotActive(AccountNotActiveException ex,
+                                                           HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ApiError(HttpStatus.FORBIDDEN.value(), "Forbidden", ex.getMessage(), request.getRequestURI()));
+    }
+
     public record ApiError(int status, String title, String message, String path) {}
 }
