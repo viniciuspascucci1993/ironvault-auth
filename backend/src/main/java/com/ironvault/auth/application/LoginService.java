@@ -1,10 +1,7 @@
 package com.ironvault.auth.application;
 
 import com.ironvault.auth.adapter.in.web.response.AuthResponse;
-import com.ironvault.auth.domain.exception.EmailNotConfirmedException;
-import com.ironvault.auth.domain.exception.InvalidCredentialsException;
-import com.ironvault.auth.domain.exception.TooManyRequestsException;
-import com.ironvault.auth.domain.exception.UserNotFoundException;
+import com.ironvault.auth.domain.exception.*;
 import com.ironvault.auth.domain.model.RefreshToken;
 import com.ironvault.auth.domain.model.User;
 import com.ironvault.auth.domain.port.in.LoginUseCase;
@@ -72,6 +69,11 @@ public class LoginService implements LoginUseCase {
                 throw new EmailNotConfirmedException("Por favor, confirme seu email antes de fazer login.");
             }
 
+            // Validar se o usuário está ativo
+            if (!user.isActive()) {
+                throw new AccountNotActiveException("Sua conta está pendente de aprovação.");
+            }
+
             rateLimitingService.reset("login:ip:" + ip);
             rateLimitingService.reset("login:email:" + email);
 
@@ -107,9 +109,9 @@ public class LoginService implements LoginUseCase {
         } catch (EmailNotConfirmedException e) {
             loginLogRepositoryPort.save(email, ip, userAgent, false, "E-mail não confirmado", Instant.now());
             throw e;
-        } catch (Exception e) {
-            loginLogRepositoryPort.save(email, ip, userAgent, false, e.getMessage(), Instant.now());
-            throw e;
-        }
+        } catch (AccountNotActiveException e) {
+        loginLogRepositoryPort.save(email, ip, userAgent, false, "Conta pendente de aprovação", Instant.now());
+        throw e;
+    }
     }
 }
