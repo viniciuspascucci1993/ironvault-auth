@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 public class RegisterUserService implements RegisterUserUseCase {
@@ -31,7 +33,7 @@ public class RegisterUserService implements RegisterUserUseCase {
 
     @Override
     @Transactional
-    public void execute(String email, String password, Role role, String source) {
+    public UUID execute(String email, String password, Role role, String source) {
 
         if (role == Role.ADMIN) {
             throw new IllegalArgumentException("ADMIN users cannot be registered via API");
@@ -53,6 +55,8 @@ public class RegisterUserService implements RegisterUserUseCase {
 
         userRepositoryPort.save(user);
         forgotPasswordUseCase.execute(email);
+
+        return user.getId();
 
     }
 }

@@ -47,10 +47,10 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest request) {
 
-        registerUserUseCase.execute(request.getEmail(), request.getPassword(), request.getRole(), request.getSource());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        UUID userId = registerUserUseCase.execute(request.getEmail(), request.getPassword(), request.getRole(), request.getSource());
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("userId", userId.toString()));
     }
 
     @PostMapping("/login")
