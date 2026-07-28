@@ -2,7 +2,9 @@ package com.ironvault.auth.domain.port.in;
 
 import com.ironvault.auth.domain.enums.Role;
 
+import java.util.UUID;
+
 public interface RegisterUserUseCase {
 
-    void execute(String email, String password, Role role, String source);
+    UUID execute(String email, String password, Role role, String source);
 }
