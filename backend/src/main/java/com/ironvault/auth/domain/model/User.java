@@ -15,6 +15,7 @@ public class User {
     private boolean active;
     private boolean emailConfirmed;
     private ApprovalStatus approvalStatus;
+    private UUID merchantId;
     private LocalDateTime createdAt;
 
     public User() { }
@@ -24,6 +25,7 @@ public class User {
                 boolean active,
                 boolean emailConfirmed,
                 ApprovalStatus approvalStatus,
+                UUID merchantId,
                 LocalDateTime createdAt) {
         this.id = id;
         this.email = email;
@@ -32,6 +34,7 @@ public class User {
         this.active = active;
         this.emailConfirmed = emailConfirmed;
         this.approvalStatus = approvalStatus;
+        this.merchantId = merchantId;
         this.createdAt = createdAt;
     }
 
@@ -44,6 +47,7 @@ public class User {
                 true, // sempre ativo quando cadastrado pelo ADMIN
                 false,
                 ApprovalStatus.APPROVED, // sempre aprovado quando cadastrado pelo ADMIN
+                null,
                 LocalDateTime.now()
         );
     }
@@ -102,6 +106,14 @@ public class User {
 
     public void setApprovalStatus(ApprovalStatus approvalStatus) {
         this.approvalStatus = approvalStatus;
+    }
+
+    public UUID getMerchantId() {
+        return merchantId;
+    }
+
+    public void setMerchantId(UUID merchantId) {
+        this.merchantId = merchantId;
     }
 
     public LocalDateTime getCreatedAt() {
