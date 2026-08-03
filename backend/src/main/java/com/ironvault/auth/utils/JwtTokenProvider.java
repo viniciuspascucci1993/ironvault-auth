@@ -29,14 +29,20 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
 
-        return Jwts.builder()
+        var builder = Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .issuer("ironvault-auth")
                 .subject(user.getEmail())
                 .claim("role", user.getRole().name())
                 .claim("userId", user.getId().toString())
                 .claim("ip", ipAddress)
-                .claim("userAgent", userAgent)
+                .claim("userAgent", userAgent);
+
+        if (user.getMerchantId() != null) {
+            builder.claim("merchantId", user.getMerchantId().toString());
+        }
+
+        return builder
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(getSigningKey())
@@ -81,6 +87,10 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public String extractMerchantId(String token) {
+        return extractClaims(token).get("merchantId", String.class);
     }
 
     public long getExpirationMs() {

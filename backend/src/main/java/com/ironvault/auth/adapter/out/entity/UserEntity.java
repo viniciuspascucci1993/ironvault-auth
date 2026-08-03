@@ -42,6 +42,9 @@ public class UserEntity {
     @Column(nullable = false)
     private ApprovalStatus approvalStatus;
 
+    @Column(name = "merchant_id")
+    private UUID merchantId;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 }

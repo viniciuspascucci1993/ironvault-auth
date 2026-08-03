@@ -58,6 +58,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 user.isActive(),
                 user.isEmailConfirmed(),
                 user.getApprovalStatus(),
+                user.getMerchantId(),
                 user.getCreatedAt()
         );
     }
@@ -71,6 +72,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 entity.isActive(),
                 entity.isEmailConfirmed(),
                 entity.getApprovalStatus(),
+                entity.getMerchantId(),
                 entity.getCreatedAt()
         );
     }
