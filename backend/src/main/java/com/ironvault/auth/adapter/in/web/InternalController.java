@@ -21,7 +21,7 @@ public class InternalController {
         this.updateUserMerchantIdUseCase = updateUserMerchantIdUseCase;
     }
 
-    @PatchMapping("/users/{userId}/merchant")
+    @PostMapping("/users/{userId}/merchant")
     public ResponseEntity<Void> updateMerchantId(
             @RequestHeader("X-Internal-Key") String internalKey,
             @PathVariable UUID userId,
