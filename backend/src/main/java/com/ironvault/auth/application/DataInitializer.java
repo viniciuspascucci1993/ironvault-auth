@@ -17,10 +17,10 @@ public class DataInitializer implements ApplicationRunner {
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${app.admin.email:#{null}}")
+    @Value("${ADMIN_EMAIL:#{null}}")
     private String adminEmail;
 
-    @Value("${app.admin.password:#{null}}")
+    @Value("${ADMIN_PASSWORD:#{null}}")
     private String adminPassword;
 
     public DataInitializer(UserRepositoryPort userRepositoryPort,
